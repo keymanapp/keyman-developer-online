@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { series, parallel } = require('gulp');
 const exec = require('child_process').exec;
 const execSync = require('child_process').execSync;
@@ -64,7 +65,7 @@ function installFrontend(cb) {
 }
 
 function installFrontendWebdriver(cb) {
-  runCommand2(cb, 'npm install webdriver-manager@latest', 'frontend/node_modules/protractor');
+  runCommand2(cb, 'npm install --force --production webdriver-manager@latest', 'frontend/node_modules/protractor');
 }
 
 function updateFrontendWebdriver(cb) {
@@ -78,14 +79,27 @@ function updateFrontendWebdriver(cb) {
     glob.sync('C:\\Program Files (x86)\\Google\\Chrome\\Application\\[0-9]*').forEach(function (file) {
       installedVersion = path.basename(file);
     });
-  } else if (process.env.DESKTOP_SESSION === 'ubuntu') {
+  } else if (process.env.DESKTOP_SESSION === 'ubuntu' || (process.env.ImageOS && process.env.ImageOS.startsWith('ubuntu'))) {
     console.log('Building on Ubuntu');
-    installedVersion = execSync('grep "readonly UPSTREAM_VERSION" /usr/bin/chromium-browser | cut -d "=" -f 2');
+    // ImageOS and CHROMEWEBDRIVER are set when building with GitHub actions
+    if (process.env.CHROMEWEBDRIVER) {
+      installedVersion = execSync(
+        `${process.env.CHROMEWEBDRIVER}/chromedriver --version | cut -d " " -f 2`,
+      );
+    } else {
+      installedVersion = execSync(
+        'grep "readonly UPSTREAM_VERSION" /usr/bin/chromium-browser | cut -d "=" -f 2',
+      );
+    }
   } else {
     console.log('Building on Mac');
-    glob.sync('/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/[0-9]*').sort().forEach(function (file) {
-      installedVersion = path.basename(file);
-    });
+    glob.sync(
+        '/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/[0-9]*',
+      )
+      .sort()
+      .forEach(function (file) {
+        installedVersion = path.basename(file);
+      });
   }
 
   if (installedVersion == null) {

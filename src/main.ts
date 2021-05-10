@@ -2,14 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import * as rateLimit from 'express-rate-limit';
-
 import { AppModule } from './app.module';
 import { AuthGuard } from './auth/auth.guard';
 import { ConfigService } from './config/config.service';
 import { GithubService } from './github/github.service';
 
 import express = require('express');
+import rateLimit = require('express-rate-limit');
+
 async function bootstrap(): Promise<void> {
   const config = new ConfigService();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -74,4 +74,4 @@ convert a single keyboard repo into a pull request on the huge
 
   await app.listen(config.port, config.bindingHost);
 }
-bootstrap();
+await bootstrap();

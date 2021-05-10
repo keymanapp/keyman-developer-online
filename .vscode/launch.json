@@ -28,6 +28,7 @@
       "console": "integratedTerminal",
       "env": {
         "NODE_ENV": "test",
+        "DEBUG": "kdo:*"
       },
       "sourceMaps": true,
       "runtimeArgs": ["-r", "tsconfig-paths/register", "-r", "ts-node/register"]

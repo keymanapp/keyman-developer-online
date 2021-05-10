@@ -11,6 +11,7 @@ export function loadPackage<T = any>(
   loaderFn?: () => T,
 ): T | undefined {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return loaderFn ? loaderFn() : require(packageName);
   } catch (e) {
     logger.error(MISSING_REQUIRED_DEPENDENCY(packageName, context));

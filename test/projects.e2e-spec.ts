@@ -2,6 +2,8 @@ import { HttpService, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import * as base64 from 'base-64';
+import { execSync } from 'child_process';
+import debugModule from 'debug';
 import { empty, forkJoin, from, interval, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, takeLast, takeWhile } from 'rxjs/operators';
 
@@ -21,13 +23,10 @@ import fs = require('fs');
 import path = require('path');
 import os = require('os');
 
-import debugModule = require('debug');
 const debug = debugModule('kdo:e2e');
 
 import colors = require('colors');
 colors.enable();
-
-const execSync = require('child_process').execSync;
 
 function canRunTheseTests(): boolean {
   return (

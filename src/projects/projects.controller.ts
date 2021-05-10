@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import {
   BadRequestException, Body, Controller, Get, Headers, HttpCode, HttpException, Param, Post, Put,
   Session

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import {
   Body, Controller, Delete, Get, Headers, HttpCode, Param, Post, Session, ValidationPipe
 } from '@nestjs/common';
@@ -106,6 +108,7 @@ export class UserController {
       () => this.githubService.getUserInformation(token),
       response => {
         const user = response.data as GitHubUser;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         session.login = user.login;
         return new GitHubUserDto(user);
       },
@@ -137,6 +140,7 @@ export class UserController {
     @Headers('authorization') token: string,
     @Param() params: any,
   ): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     session.login = params.username;
   }
 }

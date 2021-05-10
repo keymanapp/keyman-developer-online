@@ -15,6 +15,7 @@ export function fileExists(
     );
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function mkdir(dirName: string, options?: any): Observable<void> {
   const mkdirAsObservable = bindNodeCallback(
     (dir: string, callback: (error: Error) => void) =>

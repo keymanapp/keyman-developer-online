@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
-import { UserService } from './user.service';
-import { ErrorHelper } from '../utils/error-helper';
 import { Project } from '../model/project';
+import { ErrorHelper } from '../utils/error-helper';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',

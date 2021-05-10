@@ -37,13 +37,13 @@ describe('Observable file methods', () => {
       expect(fs.existsSync(dir)).toBe(true);
     });
 
-    it('fails if directory already exists', () => {
+    it('fails if directory already exists', async () => {
       // Setup
       const dir = path.join(tmpDir, 'mkdir-existingDir');
       fs.mkdirSync(dir);
 
       // Execute/Verify
-      expect(mkdir(dir).toPromise())
+      await expect(mkdir(dir).toPromise())
         .rejects.toThrow();
     });
 

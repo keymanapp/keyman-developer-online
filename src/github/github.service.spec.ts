@@ -455,14 +455,16 @@ describe('GitHub Service', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(spyHttpService.post).toHaveBeenCalledWith(
         'https://api.github.com/repos/keymanapp/keyboards/pulls',
-        null,
         {
-          headers: { authorization: '12345' },
-          data: {
-            title: 'the title of the PR',
-            head: 'foo:foo-myKeyboard',
-            base: 'master',
-            body: 'This is the description of the PR',
+          title: 'the title of the PR',
+          head: 'foo:foo-myKeyboard',
+          base: 'master',
+          body: 'This is the description of the PR',
+        },
+        {
+          headers: {
+            accept: 'application/vnd.github.v3+json',
+            authorization: '12345',
           },
         },
       );

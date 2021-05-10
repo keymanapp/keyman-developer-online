@@ -35,22 +35,26 @@ export class SingleProjectService {
     prefix: string,
     keyboardId: string,
   ): Observable<GitHubPullRequest | null> {
+    // eslint-disable-next-line id-blacklist
     return this.http.put<{ number; url: string; action: string }>(
       `${environment.apiUrl}/projects/${repoName}`,
       { name: keyboardId, prefix },
       { headers: { Authorization: `token ${this.userService.accessToken}` } },
     ).pipe(
       // we let caller deal with errors
+      // eslint-disable-next-line id-blacklist
       map((pullRequest: { number; url: string; action: string }) => new GitHubPullRequest(repoName, pullRequest.number, pullRequest.url, pullRequest.action)),
     );
   }
 
   public getPullRequest(repoName: string): Observable<GitHubPullRequest | null> {
+    // eslint-disable-next-line id-blacklist
     return this.http.get<{ number, url: string, action: string }>(`${environment.apiUrl}/projects/${repoName}`, {
       headers: { Authorization: `token ${this.userService.accessToken}` },
     }).pipe(
       catchError(error => {
         if (error.status === 404) {
+          // eslint-disable-next-line id-blacklist
           return of({ number: 0, url: '', action: 'notfound'});
         }
         this.errorHelper.handleError(`GET projects/${repoName} REST API`, null);

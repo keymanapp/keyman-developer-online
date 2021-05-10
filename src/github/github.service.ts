@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { HttpException, HttpService, Injectable } from '@nestjs/common';
 
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -246,15 +247,19 @@ export class GithubService {
         }
         debug('no existing PR, creating one...');
         return this.httpService
-          .post(`https://api.github.com/repos/${owner}/${repoName}/pulls`, null, {
-            headers: { authorization: token },
-            data: {
+          .post(`https://api.github.com/repos/${owner}/${repoName}/pulls`,
+            {
               title,
               head,
               base,
               body: description,
-            },
-          })
+            }, {
+              headers: {
+                authorization: token,
+                accept: 'application/vnd.github.v3+json',
+              }
+            }
+          )
           .pipe(
             tap(result => debug(`created PR #${result.data.number}`)),
             map(result => ({
@@ -263,7 +268,10 @@ export class GithubService {
               state: result.data.state,
               action: PrAction.Created,
             })),
-            catchError(err => { throw err.response.data.errors; }),
+            catchError(err => {
+              debug(`Got exception: ${err.response.status}, ${err.response.data.message}`);
+              throw err.response.data.message;
+            }),
           );
       }),
     );
@@ -334,10 +342,11 @@ export class GithubService {
 
     return this.httpService
       .patch(
-        `https://api.github.com/repos/${owner}/${repoName}/pulls/${pullNumber}`, null, {
+        `https://api.github.com/repos/${owner}/${repoName}/pulls/${pullNumber}`, {
+          state: 'closed'
+        }, {
           headers: { authorization: token },
-          data: { state: 'closed' },
-        },
+        }
       )
       .pipe(
         map(result => ({

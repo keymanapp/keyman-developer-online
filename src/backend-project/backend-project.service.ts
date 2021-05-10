@@ -148,7 +148,7 @@ export class BackendProjectService {
       if (fs.existsSync(keyboardInfoFile)) {
         const fileContent = fs.readFileSync(keyboardInfoFile);
         const data = JSON.parse(fileContent.toString());
-        if (!!data.id) {
+        if (data.id) {
           return data.id;
         }
       }

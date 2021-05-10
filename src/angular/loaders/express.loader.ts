@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable } from '@nestjs/common';
 import { AbstractHttpAdapter } from '@nestjs/core';
+
 import { loadPackage } from '../angular.utils';
 import { AngularModuleOptions } from '../interfaces/angular-options.interface';
 import { AbstractLoader } from './abstract.loader';

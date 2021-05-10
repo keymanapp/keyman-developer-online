@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { from, Observable, forkJoin } from 'rxjs';
-import { switchMap, tap, map } from 'rxjs/operators';
-import { CommitSummary } from 'simple-git/promise';
-import * as simplegit from 'simple-git/promise';
+
+import { forkJoin, from, Observable } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
+import simpleGit, { CommitResult, SimpleGit } from 'simple-git';
+
 import { deleteFolderRecursive } from '../utils/delete-folder';
-import { GitService } from './git.service';
 import { appendFile, fileExists, mkdir, mkdtemp } from '../utils/file';
+import { GitService } from './git.service';
 
 import os = require('os');
 import path = require('path');
@@ -14,7 +15,7 @@ describe('GitService', () => {
   let sut: GitService;
   let tmpDir: string;
   let module: TestingModule;
-  let git: simplegit.SimpleGit;
+  let git: SimpleGit;
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -24,7 +25,7 @@ describe('GitService', () => {
     const prefix = path.join(os.tmpdir(), 'gitrepotest-');
     tmpDir = await mkdtemp(prefix).toPromise();
     sut = module.get<GitService>(GitService);
-    git = simplegit();
+    git = simpleGit();
     jest.setTimeout(10000/* 10s */);
   });
 
@@ -36,7 +37,7 @@ describe('GitService', () => {
     service: GitService,
     repoDir: string,
     msg = 'my commit message',
-  ): Observable<CommitSummary> {
+  ): Observable<CommitResult> {
     const filePath1 = path.join(repoDir, 'somefile1.txt');
     const filePath2 = path.join(repoDir, 'somefile2.txt');
     return forkJoin([
@@ -58,7 +59,7 @@ describe('GitService', () => {
     repoDir: string,
     file: string,
     textToAppend: string,
-    commitMessage: string): Observable<CommitSummary> {
+    commitMessage: string): Observable<CommitResult> {
     return appendFile(file, textToAppend).pipe(
       switchMap(() => service.addFile(repoDir, file)),
       switchMap(() => service.commit(repoDir, commitMessage)),
@@ -82,10 +83,10 @@ describe('GitService', () => {
       expect.assertions(2);
 
       const repoDir = await sut.createRepo(path.join(tmpDir, 'mytest')).toPromise();
-      const commitSummary = await createInitialCommit(sut, repoDir).toPromise();
+      const commitResult = await createInitialCommit(sut, repoDir).toPromise();
 
-      expect(commitSummary.branch).toEqual('master');
-      expect(commitSummary.commit).toBeTruthy();
+      expect(commitResult.branch).toEqual('master');
+      expect(commitResult.commit).toBeTruthy();
     });
   });
 
@@ -130,7 +131,7 @@ describe('GitService', () => {
       await createInitialCommit(sut, repoDir).toPromise();
 
       // Execute/Verify
-      expect(sut.clone(repoDir, 'clonedRepo').toPromise())
+      await expect(sut.clone(repoDir, 'clonedRepo').toPromise())
         .rejects.toEqual(new Error('relative path'));
     });
 
@@ -780,9 +781,7 @@ describe('GitService', () => {
       expect.assertions(1);
       const repoDir = await sut.createRepo(path.join(tmpDir, 'mytest')).toPromise();
       const commitInfo = await createInitialCommit(sut, repoDir).toPromise();
-      // commitInfo.commit is something like '(root-commit) deadbeef'
-      const regex = new RegExp(/\(root-commit\) ([0-9a-f]+)/);
-      const expectedCommit = regex.exec(commitInfo.commit)[1];
+      const expectedCommit = commitInfo.commit;
 
       // Execute
       const head = await sut.getHeadCommit(repoDir).toPromise();

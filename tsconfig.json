@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "system",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es6",
+    "target": "ES2020",
     "sourceMap": true,
-    "outDir": "./dist",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "outDir": "dist",
     "baseUrl": "./",
-    "types": [
-      "jest"
-    ]
+    "types": [ "jest" ]
   },
-  "exclude": ["node_modules", "frontend"]
+  "exclude": ["node_modules", "frontend", "dist"]
 }

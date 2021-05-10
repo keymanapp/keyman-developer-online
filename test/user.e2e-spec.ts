@@ -1,7 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import request from 'supertest';
+
+import { AppModule } from '../src/app.module';
 import { GithubService } from '../src/github/github.service';
 
 describe('UserController (e2e)', () => {

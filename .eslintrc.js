@@ -1,10 +1,11 @@
 module.exports = {
   env: {
     browser: true,
-    es6: true,
+    es2021: true,
     node: true,
   },
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
@@ -12,31 +13,32 @@ module.exports = {
   parserOptions: {
     project: 'tsconfig.json',
     sourceType: 'module',
+    ecmaVersion: 12,
   },
-  plugins: [
-    '@typescript-eslint',
-    '@typescript-eslint/tslint',
-  ],
+  plugins: ['@typescript-eslint'],
   rules: {
     '@typescript-eslint/array-type': 'error',
     '@typescript-eslint/explicit-member-accessibility': [
       'off',
-      {
-        accessibility: 'explicit',
-      },
+      { accessibility: 'explicit' },
     ],
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/member-ordering': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-parameter-properties': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/prefer-for-of': 'error',
     '@typescript-eslint/prefer-function-type': 'error',
+    '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/quotes': ['error', 'single'],
     '@typescript-eslint/unified-signatures': 'error',
     'arrow-parens': ['off', 'as-needed'],
     camelcase: 'off',
-    '@typescript-eslint/camelcase': ['error', { 'allow': ['base_tree'] }],
     complexity: 'off',
     'constructor-super': 'error',
     'dot-notation': 'error',
@@ -74,12 +76,7 @@ module.exports = {
     'no-fallthrough': 'off',
     'no-invalid-this': 'off',
     'no-new-wrappers': 'error',
-    'no-shadow': [
-      'error',
-      {
-        hoist: 'all',
-      },
-    ],
+    'no-shadow': 'off',
     'no-throw-literal': 'error',
     'no-trailing-spaces': 'error',
     'no-undef-init': 'error',
@@ -87,20 +84,25 @@ module.exports = {
     'no-unsafe-finally': 'error',
     'no-unused-expressions': 'error',
     'no-unused-labels': 'error',
+    'no-explicit-any': 'off',
     'object-shorthand': 'error',
     'one-var': ['error', 'never'],
     radix: 'error',
-    'spaced-comment': ['error', 'always', {
-      'line': {
-          'markers': ['/'],
-          'exceptions': ['-', '+']
+    'spaced-comment': [
+      'error',
+      'always',
+      {
+        line: {
+          markers: ['/'],
+          exceptions: ['-', '+'],
+        },
+        block: {
+          markers: ['!'],
+          exceptions: ['*'],
+          balanced: true,
+        },
       },
-      'block': {
-          'markers': ['!'],
-          'exceptions': ['*'],
-          'balanced': true
-      }
-    }],
+    ],
     'use-isnan': 'error',
     'valid-typeof': 'off',
   },

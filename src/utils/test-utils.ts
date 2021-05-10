@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 function evaluateCondition(condition): any {
   return typeof condition === 'function' ? condition() : !!condition;
 }

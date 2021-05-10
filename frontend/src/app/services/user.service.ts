@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
 
-import { GitHubUser } from '../model/git-hub-user';
+import { Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
 import { environment } from '../../environments/environment';
-import { ErrorHelper } from '../utils/error-helper';
+import { GitHubUser } from '../model/git-hub-user';
 import { User } from '../model/user';
+import { ErrorHelper } from '../utils/error-helper';
 
 @Injectable({
   providedIn: 'root',

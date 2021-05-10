@@ -53,7 +53,7 @@ export class PullRequestComponent implements OnInit {
   }
 
   public get appliedAction(): string {
-    if (this.pullRequest.action == 'created') {
+    if (this.pullRequest.action === 'created') {
       return this.pullRequest.action;
     }
     return 'updated';

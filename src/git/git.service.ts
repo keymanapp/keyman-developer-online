@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 
+import { debug } from 'debug';
 import { from, Observable, of, throwError } from 'rxjs';
-import { catchError, flatMap, map, mapTo, switchMap, takeLast, tap } from 'rxjs/operators';
-import * as simplegit from 'simple-git/promise';
-import { CommitSummary, FetchResult, Options, PullResult } from 'simple-git/promise';
-import { BranchSummary, DefaultLogFields, ListLogSummary } from 'simple-git/typings/response';
+import { catchError, map, mapTo, mergeMap, switchMap, takeLast, tap } from 'rxjs/operators';
+import simpleGit, { CommitResult, FetchResult, Options, PullResult, SimpleGit } from 'simple-git';
+import { BranchSummary, LogResult } from 'simple-git/typings/response';
 
 import { fileExists, mkdir } from '../utils/file';
 
 import path = require('path');
 import debugModule = require('debug');
-const debug = debugModule('debug');
 const trace = debugModule('kdo:git');
 
 const gitKdoUserName = 'Keyman Developer Online';
@@ -18,21 +17,15 @@ const gitKdoEmail = 'kdo@example.com';
 
 @Injectable()
 export class GitService {
-  private git: simplegit.SimpleGit;
+  private git: SimpleGit;
 
   constructor() {
-    this.git = simplegit();
+    this.git = simpleGit();
 
     // To enable debug output, set the environment variable DEBUG=debug (or DEBUG=*)
     if (debugModule.enabled('debug')) {
-      // this.git.customBinary('/home/eberhard/Develop/kdo/gitdebug');
-      this.git.outputHandler((command, stdout, stderr) => {
-        if (command) {
-          debug(`calling: git ${command}`);
-          stdout.pipe(process.stdout);
-          stderr.pipe(process.stdout);
-        }
-      });
+      // see https://github.com/steveukx/git-js/blob/HEAD/docs/DEBUG-LOGGING-GUIDE.md
+      debug.enable('simple-git,simple-git:*');
     }
   }
 
@@ -70,6 +63,7 @@ export class GitService {
   public addFile(repoDir: string, filename: string): Observable<void> {
     return from(this.git.cwd(repoDir)).pipe(
       switchMap(() => from(this.git.add(filename))),
+      map(() => { return; })
     );
   }
 
@@ -77,7 +71,7 @@ export class GitService {
     repoDir: string,
     message: string,
     options?: Options,
-  ): Observable<CommitSummary> {
+  ): Observable<CommitResult> {
     return from(this.git.cwd(repoDir)).pipe(
       switchMap(() => from(this.git.commit(message, null, options))),
     );
@@ -132,7 +126,7 @@ export class GitService {
     args.push(commit);
     return from(this.git.cwd(repoDir)).pipe(
       switchMap(() => from(this.git.log({ '-1': null }))),
-      tap((result: ListLogSummary<DefaultLogFields>) => commitSha = result.latest.hash),
+      tap((result: LogResult) => commitSha = result.latest.hash),
       switchMap(() => from(this.git.raw(args))),
       map(patchNames => {
         const result: string[] = [];
@@ -152,7 +146,7 @@ export class GitService {
     return from(this.git.cwd(repoDir)).pipe(
       map(() => patchFile),
       tap(file => trace(`importing ${file}`)),
-      flatMap(file => from(this.git.raw(['am', '--ignore-whitespace', file]))),
+      mergeMap(file => from(this.git.raw(['am', '--ignore-whitespace', file]))),
       map(() => { /* void */ }),
       takeLast(1),
     );
@@ -160,8 +154,8 @@ export class GitService {
 
   public log(
     repoDir: string,
-    options?: {},
-  ): Observable<ListLogSummary<DefaultLogFields>> {
+    options?: unknown,
+  ): Observable<LogResult> {
     if (options) {
       return from(this.git.cwd(repoDir)).pipe(
         switchMap(() => from(this.git.log(options))),
@@ -181,7 +175,7 @@ export class GitService {
       switchMap(() => this.isBranch(repoDir, name)),
       switchMap(branchExists => {
         if (branchExists) {
-          return from(this.git.checkout(name));
+          return from(this.git.checkout(name)).pipe(map(() => { return; }));
         } else {
           if (trackingBranch) {
             return from(this.git.checkoutBranch(name, trackingBranch));
@@ -317,6 +311,7 @@ export class GitService {
   ): Observable<void> {
     return from(this.git.cwd(repoDir)).pipe(
       switchMap(() => from(this.git.addRemote(remoteName, remoteRepo))),
+      map(() => { return; })
     );
   }
 
@@ -326,7 +321,7 @@ export class GitService {
     message: string,
   ): Observable<void> {
     return from(this.git.cwd(repoDir)).pipe(
-      switchMap(() => from(this.git.silent(true).raw(['notes', '--ref=kdo', 'add', commitSha, '-m', message]))),
+      switchMap(() => from(this.git.raw(['notes', '--ref=kdo', 'add', commitSha, '-m', message]))),
       catchError((err: string) => throwError(new Error(err))),
       map(() => { return; }),
     );
@@ -370,7 +365,7 @@ export class GitService {
   public hasCommits(repoDir: string): Observable<boolean> {
     return from(this.git.cwd(repoDir)).pipe(
       switchMap(() => from(this.git.raw(['rev-list', '-n', '1', '--all']))),
-      map(output => output != null),
+      map(output => (typeof output != 'undefined' && output) ? true : false),
     );
   }
 
@@ -380,7 +375,7 @@ export class GitService {
       switchMap(hasCommits => {
         if (hasCommits) {
           return from(this.log(repoDir, { '-1': null })).pipe(
-            map((result: ListLogSummary<DefaultLogFields>) => result.latest.hash),
+            map((result: LogResult) => result.latest.hash),
           );
         }
         return of('');

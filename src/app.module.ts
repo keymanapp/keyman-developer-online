@@ -1,21 +1,21 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { CookieParserMiddleware } from '@nest-middlewares/cookie-parser';
-import { HelmetMiddleware } from '@nest-middlewares/helmet';
 import { ExpressSessionMiddleware } from '@nest-middlewares/express-session';
-import * as expressSession from 'express-session';
+import { HelmetMiddleware } from '@nest-middlewares/helmet';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import { AngularModule } from './angular/angular.module';
 import { AuthModule } from './auth/auth.module';
+import { BackendProjectModule } from './backend-project/backend-project.module';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { ProjectsModule } from './projects/projects.module';
-import { GithubModule } from './github/github.module';
-import { GitService } from './git/git.service';
-import { BackendProjectModule } from './backend-project/backend-project.module';
 import { GitModule } from './git/git.module';
+import { GitService } from './git/git.service';
+import { GithubModule } from './github/github.module';
+import { ProjectsModule } from './projects/projects.module';
 import { PullRequestModule } from './pull-request/pull-request.module';
 
 import memoryStoreModule = require('memorystore');
+import expressSession = require('express-session')
 const MemoryStore = memoryStoreModule(expressSession);
 
 @Module({
